@@ -1,0 +1,8 @@
+### commands:
+minikube start --driver docker --force --cpus 2 --memory 8192
+minikube profile list
+minikube node list
+minikube node delete minikube-m02
+kubectl get pods -A
+kubectl get svc -A
+minikube ssh - консоль кластера
