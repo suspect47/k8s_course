@@ -1,4 +1,4 @@
-### commands:
+#commands:
 minikube start --driver docker --force --cpus 2 --memory 8192
 minikube profile list
 minikube node list
@@ -13,3 +13,108 @@ kubectl port-forward --address 0.0.0.0 --namespace kubernetes-dashboard svc/kube
 kubectl api-versions
 kubectl api-resources
 kubectl explain pod/svc/...
+
+sudo nano /root/.kube/config файл конфига кластера
+
+sudo kubectl config view - смотрим какие конфиги есть
+
+kubectl config set-cluster <cluster> \
+--server=https://<ip>:8443 \
+--certificate-authority=<path to cert>
+
+kubectl config unset clusters.<name>
+
+kubectl config set-credentials <user> \
+--client-certificate=<cert-file> \
+--client-key=<key-file>
+
+kubectl config unset users.<user>
+
+kubectl config set-context <context> \
+--cluster=<cluster> \
+--user=<user> \
+--namespace=<namespace>
+
+kubectl config unset contexts.<name>
+
+sudo kubectl config get-contexts
+
+kubectl config use-context <name>
+
+kubectl config current-context
+
+kubectl config view --minify укоротить до текущего контекста если много контекстов
+
+kubectx is a utility to manage and switch between kubectl contexts. Repo is
+github.com/ahmetb/kubectx
+
+cubectx amazon-context переключиться на контекст amazon-context
+kubectx minikube переключиться на контекст minikube
+
+kubectl version - версия клиента и сервера kubectl
+
+kubectl cluster-info инфа о кластере
+kubectl cluster-info dump - развернутая инфа о кластере в json
+
+kubectl get nodes - получить список нод из данного контекста
+kubectl describe nodes ip-10-0-1-115.eu-central-1.compute.internal - инфа о ноде
+
+kubectl get componentstatuses - статус компонентов (для дебага)
+
+
+создать под и выполнить команду из файла pod-test-command.yaml
+kubectl apply -f pod-test-command.yaml
+
+
+
+cat pod-test-command.yaml 
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-test-command
+spec:
+  containers:
+    - name: busybox-container
+      image: busybox
+      imagePullPolicy: IfNotPresent
+      command:
+        - /bin/sh
+      args:
+        - "-c"
+        - |
+          echo Start
+          for i in 1 2 3;
+            do
+            ls -l /
+            sleep 1
+          done
+          echo Finish
+  restartPolicy: Never
+
+
+
+
+
+kubectl get namespaces
+
+kubectl create namespace lol
+
+kubectl delete namespace lol
+
+kubectl apply -f namespace.yaml - из файла 
+
+
+
+igi@igi-msi:~/Downloads$ cat namespace.yaml 
+kind: Namespace
+apiVersion: v1
+metadata:
+  name: lol
+  
+  
+
+kubectl apply -f test-pod.yaml --namespace=lol
+
+если удаляем namespace, то удаляется все его содержимое вместе с ним
+
+kubens - быстрое переключение на namespaces (https://github.com/ahmetb/kubectx)
