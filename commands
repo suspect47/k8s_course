@@ -1,9 +1,10 @@
-#commands:
+commands:
 minikube start --driver docker --force --cpus 2 --memory 8192
 minikube profile list
 minikube node list
 minikube node delete minikube-m02
 kubectl get pods -A
+kubectl get pods -A -o wide длинная инфа 
 kubectl get svc -A
 minikube ssh - консоль кластера
 minikube addons list
@@ -118,3 +119,79 @@ kubectl apply -f test-pod.yaml --namespace=lol
 если удаляем namespace, то удаляется все его содержимое вместе с ним
 
 kubens - быстрое переключение на namespaces (https://github.com/ahmetb/kubectx)
+
+kubelive - прога для интерактивного отображения namespaces и их содержимого
+
+kubectl delete pod <pod>
+kubectl delete -f pod.yaml
+
+kubectl logs -c <container name> - логи контейнера
+
+kubectl exec <pod> [-c container] [-i] [-t] -- <command>
+
+kubectl exec -it two-containers -c nginx-container -- /bin/bash
+
+kubectl cp <src> <dest> [-c container]
+kubectl cp script.sh command-continuous:/tmp
+
+kubectl port-forward <pod> [locahost-port:]<pod-port> прокинуть порт в контейнер
+
+kubectl describe pod two-containers
+
+kubectl logs two-containers -c debian-container
+kubectl logs two-containers -c nginx-containers
+
+kubectl logs command-continuous --follow 
+
+kubectl cp command-continuous:/tmp/message.txt message.txt
+
+-------
+https://github.com/kubernetes/kubectl/issues/454   копирование файлов из остановленных контейнеров
+
+Обходные пути:
+
+Залезть на узел и через docker забрать файлы https://stackoverflow.com/questions/34429757/how-to-copy-file-to-stopped-docker-container
+
+Держать запущенным ещё один процесс, чтобы контейнер не падал (осторожно)
+-------
+
+
+https://kubernetes.io/docs/concepts/workloads/pods/init-containers/ мультиконтейнеры
+
+kubectl get pod pod-test-command -o yaml инфа в ямле
+
+--------------
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: command-continuous
+spec:
+  containers:
+    - name: busybox-container
+      image: bash
+
+      lifecycle:
+        preStop:
+          exec:
+            command: ["kill","-SIGUSR1","1"]
+
+      command:
+        - /bin/sh
+      args:
+        - "-c"
+        - |
+          trap "echo USR1; sleep 2; exit" USR1
+          echotime() {
+          echo $(date +'%Y.%m.%d %H:%M:%S') $@
+          }
+          echotime Starting
+          for i in $(seq 1 100); do
+            echotime "i=$i"
+            sleep 1
+          done
+  restartPolicy: OnFailure
+
+-------------
+
+https://docs.docker.com/engine/reference/commandline/kill/ 
