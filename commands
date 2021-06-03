@@ -195,3 +195,93 @@ spec:
 -------------
 
 https://docs.docker.com/engine/reference/commandline/kill/ 
+
+kubectl get pod lol -o yaml > lol.yaml запущенный под конвертим в конфиг файл, из него можно потом запустить новый под.
+
+
+minikube addons enable metrics-server - включаем сервер метрик
+утилита k9s - полное управление кластером
+
+утилита yq - парсер. 
+kubectl get pods pod-test-command -o yaml | yq e -
+
+-----------------------------------                                                                
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: cpu-min-max-demo-lr
+spec:
+  limits:
+  - max:
+      cpu: "800m"
+    min:
+      cpu: "200m"
+    type: Container
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: cpu-fine
+spec:
+  containers:
+    - name: ctr
+      image: vish/stress
+      imagePullPolicy: IfNotPresent
+      args: ["-cpus", "1"]
+
+-------------------------------------
+
+kubectl get limits
+kubectl api-resources | grep Range
+kubectl delete limits cpu-min-max-demo-lr
+
+kubectl get pod --show-labels
+
+kubectl get pod -l ver=alpha
+kubectl label pods frontend-pod ver=alpha ver=beta --overwrite
+kubectl get pod -l ver=beta
+
+NAME           READY   STATUS    RESTARTS   AGE     LABELS
+cpu-fine       1/1     Running   0          8m56s   tier=backend,ver=alpha
+frontend-pod   1/1     Running   0          10m     test=true,tier=frontend,ver=beta
+
+kubectl label pod frontend-pod test-
+
+kubectl label pods frontend-pod debug=
+
+аннотации:
+kubectl get pods 123 -o yaml | less
+kubectl annotate pod frontend-pod owner=me
+
+
+replica sets:
+
+kubectl describe rs <pod>
+
+kubectl scale rs frontend --replicas 0
+
+--------------------
+igi@igi-msi:~/Downloads/kubernets-training/files/rs$ kubectl get rs
+NAME       DESIRED   CURRENT   READY   AGE
+frontend   3         3         3       59s
+igi@igi-msi:~/Downloads/kubernets-training/files/rs$ kubectl get rs -o wide
+NAME       DESIRED   CURRENT   READY   AGE   CONTAINERS   IMAGES   SELECTOR
+frontend   3         3         3       74s   nginx        nginx    tier=frontend
+igi@igi-msi:~/Downloads/kubernets-training/files/rs$ get pod -l tier=frontend
+
+Command 'get' not found, but there are 18 similar ones.
+
+igi@igi-msi:~/Downloads/kubernets-training/files/rs$ kubectl get pod -l tier=frontend
+NAME             READY   STATUS    RESTARTS   AGE
+frontend-g4rnk   1/1     Running   0          2m3s
+frontend-pod     1/1     Running   0          34m
+frontend-w5dkx   1/1     Running   0          2m3s
+-----------------------------
+
+kubectl get rs
+kubectl get rs -o wide
+kubectl get pod -l tier=frontend
+kubectl delete rs frontend
+
+
+kubectl delete pod -l tier
