@@ -285,3 +285,84 @@ kubectl delete rs frontend
 
 
 kubectl delete pod -l tier
+
+kubectl diff -f rs/frontend-rs.yaml сравнение файла и кластера и показ runtime изменений
+в случае если что-то меняли (мы добавили реплик в примере на курсе) - увидим по выводу
+
+
+
+
+
+kubectl apply -f 123.yaml --record
+
+kubectl describe pod nginx-deployment-66b6c48dd5-nprd8
+
+kubectl describe deployments nginx-deployment
+
+
+----------------
+kubectl describe deployments nginx-deployment
+Name:                   nginx-deployment
+Namespace:              default
+CreationTimestamp:      Fri, 04 Jun 2021 10:50:40 +0300
+Labels:                 <none>
+Annotations:            deployment.kubernetes.io/revision: 1
+Selector:               app=nginx
+Replicas:               3 desired | 3 updated | 3 total | 3 available | 0 unavailable
+StrategyType:           RollingUpdate
+MinReadySeconds:        0
+RollingUpdateStrategy:  25% max unavailable, 25% max surge
+Pod Template:
+  Labels:  app=nginx
+  Containers:
+   nginx:
+    Image:        nginx:1.14.2
+    Port:         80/TCP
+    Host Port:    0/TCP
+    Environment:  <none>
+    Mounts:       <none>
+  Volumes:        <none>
+Conditions:
+  Type           Status  Reason
+  ----           ------  ------
+  Available      True    MinimumReplicasAvailable
+  Progressing    True    NewReplicaSetAvailable
+OldReplicaSets:  <none>
+NewReplicaSet:   nginx-deployment-66b6c48dd5 (3/3 replicas created)
+Events:
+  Type    Reason             Age   From                   Message
+  ----    ------             ----  ----                   -------
+  Normal  ScalingReplicaSet  4m1s  deployment-controller  Scaled up replica set nginx-deployment-66b6c48dd5 to 3
+----------------------------
+
+kubectl get rs получить список репликасетов
+
+kubectl apply -f kubernets-training/files/deploy/nginx-deploy.yaml --record=true обновляем деплоймент с новой версией nginx и добавлением аннотации об обновлении
+
+kubectl rollout status deployment/nginx-deployment
+
+kubectl rollout history deployment nginx-deployment история
+
+kubectl get deployment/nginx-deployment
+
+kubectl rollout history deployment nginx-deployment --revision=2 инфа 
+
+
+
+
+
+kubectl rollout pause deployment/nginx-deployment
+kubectl set image deployment/nginx-deployment nginx=nginx:1.14.2
+kubectl rollout history deployment/nginx-deployment
+kubectl set resources deployment/nginx-deployment -c=nginx --limits=cpu=200m,memory=512Mi лимиты для каждого контейнера
+
+kubectl rollout resume deployment/nginx-deployment
+
+
+
+
+kubectl get svc посмотреть сервисы
+
+kubectl scale deployment myphyton-deployment --replicas=3
+
+kubectl describe service myservice
